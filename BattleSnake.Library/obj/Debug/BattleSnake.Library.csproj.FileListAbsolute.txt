@@ -1,0 +1,5 @@
+C:\Users\Alishah.Novin\Downloads\BattleSnake\BattleSnake\BattleSnake.Library\bin\Debug\BattleSnake.Library.dll
+C:\Users\Alishah.Novin\Downloads\BattleSnake\BattleSnake\BattleSnake.Library\bin\Debug\BattleSnake.Library.pdb
+C:\Users\Alishah.Novin\Downloads\BattleSnake\BattleSnake\BattleSnake.Library\obj\Debug\BattleSnake.Library.csprojResolveAssemblyReference.cache
+C:\Users\Alishah.Novin\Downloads\BattleSnake\BattleSnake\BattleSnake.Library\obj\Debug\BattleSnake.Library.dll
+C:\Users\Alishah.Novin\Downloads\BattleSnake\BattleSnake\BattleSnake.Library\obj\Debug\BattleSnake.Library.pdb

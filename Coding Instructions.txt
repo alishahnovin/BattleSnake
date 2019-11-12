@@ -1,0 +1,5 @@
+1) Build your snake by inheriting SnakeNavigator (Reference BattleSnake.Library.dll)
+2) Place your compiled DLL in the same folder as BattleSnake.exe
+3) Run BattleSnake.exe
+4) Delete other Snake DLLs if you want to test your own snake by itself
+5) *You can copy the same DLL multiple times to test your snake against itself*
