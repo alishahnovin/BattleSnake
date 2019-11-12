@@ -1,4 +1,4 @@
-﻿using BattleSnake.Library;
+using BattleSnake.Library;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +14,9 @@ namespace BattleSnake
         private Mode _Mode = Mode.StepWise;
         private int _InitialSnakeLength = 1;
         private int _GrowthFactor = 1;
+        private int _TimeLimit = 5;
+        private int _MaxTimeLimit = 10;
+        private int _MinTimeLimit = 1;
 
         private int _MinSpeed = 250;
         private int _MaxSpeed = 10;
@@ -26,6 +29,7 @@ namespace BattleSnake
         private int _RightEdge = 0;
         private int _BottomEdge = 0;
         private int _Round = 0;
+        private DateTime _RoundStartTime = DateTime.MinValue;
         private int _TotalRounds = 0;
 
         private bool _GameStarted = false;
@@ -220,7 +224,7 @@ namespace BattleSnake
 
         #region SplashScreen
         private bool _AlreadyDrawn = false;
-        private void DrawSplashScreen()
+        private void RenderSplashScreen()
         {
             if (!_AlreadyDrawn)
             {
@@ -290,12 +294,12 @@ namespace BattleSnake
 
             Console.SetCursorPosition(1, 47);
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write("                         Mode (M): ");
+            Console.Write("            Mode (M): ");
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write(_Mode.ToString());
 
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write(" Type (T): ");
+            Console.Write(" Battle (B): ");
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write(_MatchType.ToString());
 
@@ -312,7 +316,20 @@ namespace BattleSnake
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write(" Growth Size (G): ");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine(_GrowthFactor);
+            Console.Write(_GrowthFactor);
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write(" Time Limit (T): ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write(_TimeLimit > _MaxTimeLimit ? "Unlimited" : _TimeLimit.ToString());
+            if (_TimeLimit == 1)
+            {
+                Console.WriteLine("min       ");
+            }
+            else if (_TimeLimit<=_MaxTimeLimit)
+            {
+                Console.WriteLine("mins      ");
+            }
 
             //while on the splash screen, let the user set game conditions
             while (!_GameStarted)
@@ -343,7 +360,7 @@ namespace BattleSnake
             Console.CursorVisible = false;
             Console.Clear();
 
-            DrawSplashScreen();
+            RenderSplashScreen();
 
             foreach (Type type in SnakeNavigators)
             {
@@ -447,6 +464,7 @@ namespace BattleSnake
         private void StartRound(Snake[] Snakes)
         {
             _Round++;
+            _RoundStartTime = DateTime.Now;
             _Snakes = Snakes.ToArray();
 
             _GameMatrix = new GamePieces[Width][];
@@ -516,7 +534,7 @@ namespace BattleSnake
 
             Console.ForegroundColor = ConsoleColor.Cyan; Console.Write(@"M: ");
             Console.ForegroundColor = ConsoleColor.White; Console.Write("Change Mode");
-            Console.ForegroundColor = ConsoleColor.Cyan; Console.Write("   T:");
+            Console.ForegroundColor = ConsoleColor.Cyan; Console.Write("   B:");
             Console.ForegroundColor = ConsoleColor.White; Console.Write(" Change Match Type");
 
             Console.SetCursorPosition(99, 33);
@@ -526,7 +544,9 @@ namespace BattleSnake
             Console.ForegroundColor = ConsoleColor.White; Console.Write("Change Growth Factor");
 
             Console.SetCursorPosition(99, 34);
-            Console.ForegroundColor = ConsoleColor.Cyan; Console.Write(@"Esc: ");
+            Console.ForegroundColor = ConsoleColor.Cyan; Console.Write(@"T: ");
+            Console.ForegroundColor = ConsoleColor.White; Console.Write("Change Match Time Limit");
+            Console.ForegroundColor = ConsoleColor.Cyan; Console.Write(@"  Esc: ");
             Console.ForegroundColor = ConsoleColor.White; Console.Write("Restart");
 
             Console.ForegroundColor = ConsoleColor.Green;
@@ -600,6 +620,13 @@ namespace BattleSnake
                 RunStep();
                 KeyChecker();
                 Thread.Sleep(5);
+                if (_TimeLimit <= _MaxTimeLimit && _RoundStartTime.AddSeconds(_TimeLimit * 60).Subtract(DateTime.Now).TotalSeconds <= 0)
+                {
+                    foreach (Snake snake in _Snakes)
+                    {
+                        KillSnake(snake);
+                    }
+                }
             }
         }
 
@@ -612,7 +639,7 @@ namespace BattleSnake
             Console.Write(_Mode.ToString());
 
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write(" Type: ");
+            Console.Write(" Battle: ");
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write(_MatchType.ToString());
 
@@ -632,7 +659,37 @@ namespace BattleSnake
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write(_GrowthFactor);
 
-            Console.SetCursorPosition(99, 8);
+            if (_TimeLimit <= _MaxTimeLimit)
+            {
+                Console.SetCursorPosition(99, 7);
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("Time: ");
+
+                TimeSpan timeLeft = _RoundStartTime.AddSeconds(_TimeLimit * 60).Subtract(DateTime.Now);
+                if (timeLeft.TotalSeconds < 1)
+                {
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                }
+                else if (timeLeft.TotalSeconds > 31)
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else if (timeLeft.TotalSeconds < 16)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                }
+                else if (timeLeft.TotalSeconds < 31)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                }
+                Console.Write(timeLeft.TotalMinutes >= 1 ? timeLeft.ToString(@"m'm'\ ss's'") : timeLeft.ToString("ss's'"));
+            }
+
+            Console.SetCursorPosition(99, 9);
             Console.ForegroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Scores:");
@@ -640,7 +697,7 @@ namespace BattleSnake
             int count = 1;
             foreach (var kvp in _RoundRobin.OrderByDescending(r => r.Value))
             {
-                Console.SetCursorPosition(101, 8 + count);
+                Console.SetCursorPosition(101, 9 + count);
 
                 Snake snake = _Snakes.FirstOrDefault(snk => snk.SnakeNavigator.GetType().Equals(kvp.Key));
 
@@ -655,13 +712,17 @@ namespace BattleSnake
                 }
                 Console.WriteLine(string.Format("{0}. {1} {3} {2}      ", count, label, score, padding));
                 count++;
+                if (count > 10)
+                {
+                    break;
+                }
             }
 
             Console.ForegroundColor = ConsoleColor.White;
 
-            Console.SetCursorPosition(99, 8 + count + 1);
+            Console.SetCursorPosition(99, 9 + count + 1);
             Console.WriteLine("--------------------------------------------");
-            Console.SetCursorPosition(99, 8 + count + 2);
+            Console.SetCursorPosition(99, 9 + count + 2);
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("Round: ");
             Console.Write(string.Format("{0} of {1}", _Round, _TotalRounds));
@@ -677,7 +738,24 @@ namespace BattleSnake
                 }
                 else
                 {
-                    DrawSplashScreen();
+                    RenderSplashScreen();
+                }
+            }
+            else if (Keyboard.IsKeyDown(KeyCode.T))
+            {
+                _TimeLimit++;
+                if (_TimeLimit > _MaxTimeLimit+1) { _TimeLimit = _MinTimeLimit; }
+                if (_GameStarted)
+                {
+                    foreach (Snake snake in _Snakes)
+                    {
+                        KillSnake(snake);
+                    }
+                    SetupRoundRobin();
+                }
+                else
+                {
+                    RenderSplashScreen();
                 }
             }
             else if (Keyboard.IsKeyDown(KeyCode.Down) && _Speed < _MinSpeed)
@@ -689,7 +767,7 @@ namespace BattleSnake
                 }
                 else
                 {
-                    DrawSplashScreen();
+                    RenderSplashScreen();
                 }
             }
             else if (Keyboard.IsKeyDown(KeyCode.Escape))
@@ -713,10 +791,10 @@ namespace BattleSnake
                 }
                 else
                 {
-                    DrawSplashScreen();
+                    RenderSplashScreen();
                 }
             }
-            else if (Keyboard.IsKeyDown(KeyCode.T))
+            else if (Keyboard.IsKeyDown(KeyCode.B))
             {
                 _MatchType = _MatchType == MatchType.HeadToHead ? MatchType.Full : MatchType.HeadToHead;
                 if (_GameStarted)
@@ -729,7 +807,7 @@ namespace BattleSnake
                 }
                 else
                 {
-                    DrawSplashScreen();
+                    RenderSplashScreen();
                 }
             }
             else if (Keyboard.IsKeyDown(KeyCode.S))
@@ -746,7 +824,7 @@ namespace BattleSnake
                 }
                 else
                 {
-                    DrawSplashScreen();
+                    RenderSplashScreen();
                 }
             }
             else if (Keyboard.IsKeyDown(KeyCode.G))
@@ -763,7 +841,7 @@ namespace BattleSnake
                 }
                 else
                 {
-                    DrawSplashScreen();
+                    RenderSplashScreen();
                 }
             }
             else if (Keyboard.IsKeyDown(KeyCode.K))
