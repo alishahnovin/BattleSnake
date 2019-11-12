@@ -712,10 +712,15 @@ namespace BattleSnake
                 }
                 Console.WriteLine(string.Format("{0}. {1} {3} {2}      ", count, label, score, padding));
                 count++;
-                if (count > 10)
+                if (count > 15)
                 {
                     break;
                 }
+            }
+            if (_RoundRobin.Count > 15)
+            {
+                Console.SetCursorPosition(101, 9 + count);
+                Console.WriteLine("...");
             }
 
             Console.ForegroundColor = ConsoleColor.White;
