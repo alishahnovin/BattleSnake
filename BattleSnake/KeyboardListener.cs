@@ -61,6 +61,7 @@ namespace BattleSnake
         Escape = 0x1B,
         K = 0x4B,
         M = 0x4D,
+        B = 0x42,
         T = 0x54,
         G = 0x47,
         S = 0x53,
