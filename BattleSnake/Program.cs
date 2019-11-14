@@ -135,10 +135,25 @@ namespace BattleSnake
                         Console.WriteLine("        (No snakes defined in DLL)");
                     }
                 }
-                catch
+                catch (System.Reflection.ReflectionTypeLoadException ex)
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("        (No snakes defined in DLL)");
+                    if (ex.LoaderExceptions.Length > 0)
+                    {
+                        for (int i = 0; i < ex.LoaderExceptions.Length; i++)
+                        {
+                            Console.WriteLine(string.Format("        (No snakes defined in DLL: {0})", ex.LoaderExceptions[i].Message));
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine(string.Format("        (No snakes defined in DLL: {0})", ex.Message));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(string.Format("        (No snakes defined in DLL: {0})", ex.Message));
                 }
             }
 
