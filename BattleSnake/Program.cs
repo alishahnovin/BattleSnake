@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,21 +11,75 @@ namespace BattleSnake
     {
         private static void Main(string[] args)
         {
+            SetWindowSettings();
+            RenderTitle();
             GameEngine.Start
             (
                 InitializeAndLoadLocalDLLs()
             );
         }
 
-        //I wouldn't recommend loading any old remote DLL unless you're sure of the source...
-        private static Type[] InitializeAndLoadLocalDLLs()
+        private static void SetWindowSettings()
+        {
+            while (true)
+            {
+                try
+                {
+                    Console.SetWindowSize((GameEngine.Width * 2) + 50, GameEngine.Height + 1);
+                    break;
+                }
+                catch
+                {
+                    Console.Clear();
+                    Thread.Sleep(350);
+                    RenderTitle();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(string.Empty);
+                    Console.WriteLine("  Console Font Size is too large; Please reduce Font Size in Console properties in order to launch.");
+                    Console.WriteLine(string.Empty);
+                    Console.WriteLine("  Right click on the Command Window title bar, and go to 'Properties' and reduce the font-size.");
+                    Console.WriteLine(string.Empty);
+                    Console.WriteLine("  Press enter to continue...");
+                    Console.Read();
+                }
+            }
+
+            while (true)
+            {
+                try
+                {
+                    Console.SetBufferSize((GameEngine.Width * 2) + 50, GameEngine.Height + 1);
+                    break;
+                }
+                catch
+                {
+                    Console.Clear();
+                    Thread.Sleep(350);
+                    RenderTitle();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(string.Empty);
+                    Console.WriteLine("  Buffer is too small; Please increase Buffer Size.");
+                    Console.WriteLine(string.Empty);
+                    Console.WriteLine("  Right click on the Command Window title bar, and go to 'Properties' and incease the buffer.");
+                    Console.WriteLine(string.Empty);
+                    Console.WriteLine("  Press enter to continue...");
+                    Console.Read();
+                }
+            }
+        }
+
+        private static void RenderTitle()
         {
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.CursorVisible = false;
             Console.Title = "Battle Snake";
-            Console.SetWindowSize((GameEngine.Width * 2) + 50, GameEngine.Height + 1);
-            Console.SetBufferSize((GameEngine.Width * 2) + 50, GameEngine.Height + 1);
+            try
+            {
+                Console.SetWindowSize((GameEngine.Width * 2) + 50, GameEngine.Height + 1);
+                Console.SetBufferSize((GameEngine.Width * 2) + 50, GameEngine.Height + 1);
+            }
+            catch { }
             Console.SetWindowPosition(0, 0);
             Console.CursorVisible = false;
             Console.Clear();
@@ -38,7 +92,11 @@ namespace BattleSnake
             Console.WriteLine("");
             Console.WriteLine("  Initializing...");
             Thread.Sleep(1000);
+        }
 
+        //I wouldn't recommend loading any old remote DLL unless you're sure of the source...
+        private static Type[] InitializeAndLoadLocalDLLs()
+        {
             string[] files = System.IO.Directory.GetFiles(System.IO.Directory.GetCurrentDirectory(), "*.dll"); //get all files
 
             Console.WriteLine("  Loading DLLs...");
