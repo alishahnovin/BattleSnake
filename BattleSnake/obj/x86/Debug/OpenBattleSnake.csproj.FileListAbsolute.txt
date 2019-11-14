@@ -1,4 +1,0 @@
-C:\Users\Alishah Novin\Desktop\OpenBattleSnake\OpenBattleSnake\bin\Debug\OpenBattleSnake.exe
-C:\Users\Alishah Novin\Desktop\OpenBattleSnake\OpenBattleSnake\bin\Debug\OpenBattleSnake.pdb
-C:\Users\Alishah Novin\Desktop\OpenBattleSnake\OpenBattleSnake\obj\x86\Debug\OpenBattleSnake.exe
-C:\Users\Alishah Novin\Desktop\OpenBattleSnake\OpenBattleSnake\obj\x86\Debug\OpenBattleSnake.pdb
